@@ -1,9 +1,8 @@
-use std::{fs::File, io::{self, Write}};
+use std::io::Write;
 use std::fs::OpenOptions;
 
 
 use axum::{routing::get, Router, Json, extract::Query};
-use serde_json::{Value,json};
 
 use tapciify::{image_to_ascii, DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
 
@@ -14,9 +13,7 @@ use structs::{AsciiResponse, QueryParams};
 #[tokio::main]
 async fn main(){
     let app = Router::new()
-        .route("/", get(hello_world));
-    let host = "http://localhost:3000";
-
+        .route("/", get(send_ascii));
     // run it with hyper on localhost:3000
     axum::Server::bind(&"127.0.0.1:3000".parse().unwrap())
         .serve(app.into_make_service())
@@ -35,7 +32,7 @@ async fn download_image(image_link: String) -> String {
     image_path.to_string()
 }
 
-async fn hello_world(query: Query<QueryParams>) -> Json<AsciiResponse> {
+async fn send_ascii(query: Query<QueryParams>) -> Json<AsciiResponse> {
     let image = image::open(download_image(query.image.clone()).await);
 
     let ascii_img = image_to_ascii(
