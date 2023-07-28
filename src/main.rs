@@ -1,19 +1,21 @@
-use std::path::PathBuf;
 use axum::{routing::get, Router, Json, extract::Query};
 use tapciify::{image_to_ascii, DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
 mod structs;
 use structs::{AsciiResponse, QueryParams};
 
 
-#[shuttle_runtime::main]
-async fn axum(#[shuttle_static_folder::StaticFolder(folder = "assets")] public_folder: PathBuf) -> shuttle_axum::ShuttleAxum {
-    println!("{:?}", &public_folder);
-
-    let router = Router::new()
+#[tokio::main]
+async fn main(){
+    let app = Router::new()
         .route("/", get(send_ascii));
 
-    Ok(router.into())
+
+    axum::Server::bind(&"127.0.0.1:3000".parse().unwrap())
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
 }
+
 
 async fn send_ascii(query: Query<QueryParams>) -> Json<AsciiResponse> {
     let img_bytes = reqwest::get(&query.image).await.unwrap().bytes().await.unwrap();
