@@ -13,7 +13,7 @@ For now Webciify can be installed using Git + Rust.
 
 Clone this repository:
 ```bash
-git clone https://github.com/triistam/webciify
+git clone https://github.com/akumarujon/webciify
 ```
 
 Change dir and Compile:
